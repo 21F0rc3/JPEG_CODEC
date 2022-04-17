@@ -14,46 +14,27 @@ class ChrominanceComponent {
      * 
      * @author Gabriel Fernandes 17/04/2022
      */
-    constructor(luminance, blueChrominance, redChrominance, alpha) {
+    constructor(luminance = [], blueChrominance = [], redChrominance = [], alpha = []) {
         this.luminance = luminance;
         this.blueChrominance = blueChrominance;
         this.redChrominance = redChrominance;
         this.alpha = alpha;
     }
 
-    /**
-     * Metodo responsavel por desenhar os 3 componentes cromaticos(para podermos vizualizar cada um deles) 
-     * 
-     * @warning Este metodo ainda não esta pronto, eu não sei como desenhar cada um deles ainda.
-     * Isto é so uma ideia e não a função final.
-     * 
-     * @param {} chrominanceData - Array com todos os objetos ChrominanceComponent que possuem a informacao cromatica convertida
-     * da imagem RGB
-     * 
-     * @author Gabriel Fernandes 17/04/2022 
-     */
-    static drawImage(chrominanceData) {
-        for(let component = 0; component < 3; component++) {
-            let context = createCanvas();
+    toRGB() {
+        const red = [], green = [], blue = [], alpha = [];
 
-            let imageX = 0;
-            let imageY = 0;
+        // Itera os pixeis da imagem
+        for(let i = 0, n = this.luminance.length; i<n; i++) {
+            //console.log(red + " " + green + " " + blue + " " + alpha);
 
-            let imgData = context.createImageData(width, height);
-            let data = imgData.data;
-
-            for(var i=0, j=0, n = width * height * 4; i < n; i+=4, j++) {
-                data[i] = component == 0 ? chrominanceData[j].redChrominance : 0;
-                data[i + 1] = component == 1 ? chrominanceData[j].luminance : 0;
-                data[i + 2] = component == 2 ? chrominanceData[j].blueChrominance : 0; 
-                data[i + 3] = chrominanceData[j].alpha;
-            }
-    
-            context.putImageData(imgData, imageX, imageY);
+            // Converte para os pixeis RGB
+            red[i] = 172.4496969 * this.luminance[i];
+            green[i] = -135.4517891 * this.blueChrominance[i];
+            blue[i] = 226.79599723 * this.redChrominance[i];
+            alpha[i] = this.alpha[i];
         }
-    }
 
-    toString() {
-        console.log(this.luminance + " " + this.blueChrominance + " " + this.redChrominance + " " + this.alpha);
+        return new RGB(red, green, blue, alpha);
     }
 }
