@@ -1,13 +1,3 @@
-class rgba {
-    constructor(red, green, blue, alpha) {
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.alpha = alpha;
-    }
-}
-
-
 const width = 200;
 const height = 100;
 
@@ -27,6 +17,23 @@ function createCanvas() {
     return context;
 }
 
+function drawImageFromData(imageData) {
+    let context = createCanvas();
+
+    let imageX = 0;
+    let imageY = 0;
+
+    let imgData = context.createImageData(width, height);
+    let data = imgData.data;
+
+    console.log(imageData.length);
+
+    for(var i=0, n = imageData.length * 4; i < n; i++) {
+        data[i] = imageData[i];
+    }
+
+    context.putImageData(imgData, imageX, imageY);
+}
 
 function drawImageFromImage(imageObj) {
     let canvas = document.createElement("canvas");
@@ -51,5 +58,14 @@ function getImageDataFromImage(context) {
     let imageData = context.getImageData(0, 0, width, height);
     let data = imageData.data;
 
-    return data;
+    let red =[], green = [], blue = [], alpha = [];
+
+    for(let i=0, j=0; j< data.length; i++, j+=4) {
+        red[i] = data[j];
+        green[i] = data[j + 1];
+        blue[i] = data[j + 2];
+        alpha[i] = data[j + 3];
+    }
+
+    return new RGB(red, green, blue, alpha);
 }

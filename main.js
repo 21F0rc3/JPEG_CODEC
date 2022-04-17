@@ -14,11 +14,13 @@ imageObj.src = "Horario.PNG";
  */
 function startEncoder(imageObj) {
     let context = drawImageFromImage(imageObj);
-    let data = getImageDataFromImage(context);
+    let rgb_data = getImageDataFromImage(context);
 
-    let chrominanceData = colorSpaceConversion(data);
+    let chrominanceData = colorSpaceConversion(rgb_data);
 
-    ChrominanceComponent.drawImage(chrominanceData);
+    drawImageFromData((chrominanceData.toRGB()).toImageData());
+    //ChrominanceComponent.drawImage(chrominanceData);
+    
     //chrominanceDownsampling(chrominanceData);
 }
 
@@ -29,43 +31,64 @@ function startEncoder(imageObj) {
  * @param {ImageData} data - Dados dos pixeis da imagem
  * 
  * @returns Retorna um array com os dados cromaticos de cada pixel apos a conversão
+ *
+ * @uthor Gabriel Fernandes 16/04/2022 
  */
 function colorSpaceConversion(data) {
-    const chrominanceData = [];
-    
-    for(var i = 0, j = 0, n = width * height * 4; i<n; i+=4, j++) {
-        let red = data[i];
-        let green = data[i + 1];
-        let blue = data[i + 3];
-        let alpha = data[i + 3];
-
-        //console.log(red + " " + green + " " + blue + " " + alpha);
-
-        let luminance = (0.299 * red) + (0.587 * green) + (0.114 * blue);
-        let blueChrominance = (-0.1687 * red) + (-0.3313 * green) + (0.5 * blue) + 128;
-        let redChrominance = (0.5 * red) + (-0.4187 * green) + (-0.0813 * blue) + 128;
-
-        chrominanceData[j] = new ChrominanceComponent(luminance, blueChrominance, redChrominance, alpha);
-    }
-
-    return chrominanceData;
+    return data.toChrominanceComponent();
 }
 
+/**
+ * Segundo passo na compressão JPEG, pegar nos 2 componentes cromaticos e tornar cada 4 pixes (2x2) num 
+ * unico pixel depois re-escalar esses 2 componentes reduzidos a 1/4 para o tamanho original, e unir 
+ * dois esses 2 components ao component Luminance para formar uma nova imagem.
+ * 
+ * @param {*} chrominanceData - Array de ChrominanceComponent com os dados dos componentes cromaticos
+ * 
+ * @author Gabriel Fernandes 17/04/2022
+ */
 function chrominanceDownsampling(chrominanceData) {
-    let blueChrominanceComponent = divideComponentImage(chrominanceData[1]);
-    let redChrominanceComponent = divideComponentImage(chrominanceData[2]);
+    let blueChrominanceComponent = divideComponentImage(chrominanceData.blueChrominance);
+    let redChrominanceComponent = divideComponentImage(chrominanceData.redChrominance);
+
+    //console.log(chrominanceData.blueChrominance.length + " " + chrominanceData.alpha.length);
+
+    blueChrominanceComponent = rescaleComponentImage(blueChrominanceComponent);
+    redChrominanceComponent = rescaleComponentImage(redChrominanceComponent);
+
+    let downsampledComponent = new ChrominanceComponent(chrominanceData.luminance, blueChrominanceComponent, redChrominanceComponent, chrominanceData.alpha); 
+    
+    ChrominanceComponent.drawImage(downsampledComponent);
+    //console.log(blueChrominanceComponent.length + " " + chrominanceData.alpha.length);
 }
 
-function divideComponentImage(chrominanceComponent) {
+/**
+ * Pega no componente, e calcula a media de 4 pixeis(2x2) e torna num pixel.
+ * 
+ * @param {*} chrominanceData - Array de ChrominanceComponent com os dados dos componentes cromaticos
+ * 
+ * @returns component cromatico
+ */
+function divideComponentImage(chrominanceData) {
     const dividedChrominanceComponent = [];
     
-    for(var i = 0, j = 0, n = chrominanceComponent.length; i < n; i+=4, j++) {
-        divideComponentImage[j] = (chrominanceComponent[i] + chrominanceComponent[i + 1] + chrominanceComponent[i + 2] + chrominanceComponent[i + 3]) / 4; 
+
+    for(let i = 0, j = 0, n = chrominanceData.length; i < n; i+=4, j++) {
+        dividedChrominanceComponent[j] = (chrominanceData[i] + chrominanceData[i + 1] + chrominanceData[i + 2] + chrominanceData[i + 3]) / 4; 
     }
 
     return dividedChrominanceComponent;
 }
 
-function rescaleComponentImage() {
+function rescaleComponentImage(chrominanceComponent) {
+    const rescaledComponentImage = [];
 
+    for(let i=0, j=0; j < chrominanceComponent.length; i+=4, j++) {
+        rescaledComponentImage[i] = chrominanceComponent[j];
+        rescaledComponentImage[i + 1] = chrominanceComponent[j];
+        rescaledComponentImage[i + 2] = chrominanceComponent[j];
+        rescaledComponentImage[i + 3] = chrominanceComponent[j];
+    }
+
+    return rescaledComponentImage;
 }
