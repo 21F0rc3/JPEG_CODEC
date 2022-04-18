@@ -1,5 +1,5 @@
 /**
- * Classe reponsavel pelos Componentes chromiuns
+ * Classe reponsavel pelos Componentes Cromaticos
  * 
  * @author Gabriel Fernandes 17/04/2022
  */
@@ -21,6 +21,17 @@ class ChrominanceComponent {
         this.alpha = alpha;
     }
 
+    /**
+     * Converte um objeto ChrominanceComponent para RGB
+     * 
+     * É o responsavel pelo processo inverso do Color Space Conversion,
+     * para obtermos de volta os valores originais da imagem apos este
+     * passar pelo Chrominance Downsampling
+     * 
+     * @returns objeto RGB com a informação da imagem
+     * 
+     * @author Gabriel Fernandes 18/04/2022
+     */
     toRGB() {
         const red = [], green = [], blue = [], alpha = [];
 

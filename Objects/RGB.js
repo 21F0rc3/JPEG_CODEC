@@ -1,3 +1,20 @@
+/**
+ * Class RGB
+ * 
+ * Todos os pixeis da imagem representam um indice nos quatro arrays
+ * Cada array representam o valor daquela cor no formato RGBA
+ * 
+ * Por exemplo,
+ * red[0] = 132
+ * green[0] = 35
+ * blue[0] = 44
+ * alpha[0] = 245
+ * 
+ * Equivale ao primeiro pixel da imagem com codigo RGBA
+ * -> red = 132, green = 35, blue = 44, alpha = 245
+ * 
+ * @author Gabriel Fernandes 18/04/2022
+ */
 class RGB{
     constructor(red = [], green = [], blue = [], alpha = []) {
         this.red = red;
@@ -6,6 +23,18 @@ class RGB{
         this.alpha = alpha;
     }
 
+    /**
+     * Converte um objeto RGB para ChrominanceComponent
+     * 
+     * É o responsavel pelo processo de Color Space Conversion.
+     * 
+     * Calcula os valores de luminancia, azul cromatico e vermelho cromatico
+     * a partir dos valores RGB, segundo uma formula
+     * 
+     * @returns objeto ChrominanceComponent com a informação da imagem
+     * 
+     * @author Gabriel Fernandes 18/04/2022
+     */
     toChrominanceComponent() {
         const Y = [], Cb = [], Cr = [], A = [];
 
@@ -28,6 +57,16 @@ class RGB{
         return new ChrominanceComponent(Y,Cb,Cr,A);
     }
 
+    /**
+     * Coonverte um objeto RGB para ImageData
+     * 
+     * Ao inves de termos 4 arrays para cada cor, temos um unico
+     * array com 4 indices para representar um pixel
+     * 
+     * @returns objeto ImageData com a informação da imagem
+     * 
+     * @author Gabriel Fernandes 
+     */
     toImageData() {
         const imageData = [];
 
@@ -39,6 +78,6 @@ class RGB{
            imageData[i + 3] = this.alpha[j];
         }
 
-        return imageData;
+        return new ImageData(imageData);
     }
 }
