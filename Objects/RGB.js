@@ -44,8 +44,8 @@ class RGB{
 
             // Converte para os pixeis cromaticos
             let luminance = (0.299 * this.red[i]) + (0.587 * this.green[i]) + (0.114 * this.blue[i]);
-            let blueChrominance = (-0.1687 * this.red[i]) + (-0.3313 * this.green[i]) + (0.5 * this.blue[i]) + 128;
-            let redChrominance = (0.5 * this.red[i]) + (-0.4187 * this.green[i]) + (-0.0813 * this.blue[i]) + 128;
+            let blueChrominance = (-0.14713 * this.red[i]) + (-0.28886 * this.green[i]) + (0.436 * this.blue[i]);
+            let redChrominance = (0.615 * this.red[i]) + (-0.51499 * this.green[i]) + (-0.10001 * this.blue[i]);
 
             // Adiciona aos arrays
             Y[i] = luminance;

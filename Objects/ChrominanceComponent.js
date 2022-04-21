@@ -40,12 +40,69 @@ class ChrominanceComponent {
             //console.log(red + " " + green + " " + blue + " " + alpha);
 
             // Converte para os pixeis RGB
-            red[i] = 172.4496969 * this.luminance[i];
-            green[i] = -135.4517891 * this.blueChrominance[i];
-            blue[i] = 226.79599723 * this.redChrominance[i];
+            red[i] = 1 * this.luminance[i] + 0 * this.blueChrominance[i] + 1.13983 * this.redChrominance[i];
+            green[i] = 1 * this.luminance[i] - 0.39465 * this.blueChrominance[i] - 0.58060 * this.redChrominance[i];
+            blue[i] = 1 * this.luminance[i] + 2.03211 * this.blueChrominance[i];
             alpha[i] = this.alpha[i];
         }
 
         return new RGB(red, green, blue, alpha);
+    }
+
+    drawLuminanceComponent() {
+        let context = createCanvas();
+    
+        let imageX = 0;
+        let imageY = 0;
+    
+        let imgData = context.createImageData(width, height);
+        let data = imgData.data;
+     
+        for(var i=0, j=0, n = this.luminance.length; j < n; i+=4, j++) {
+            data[i] = this.luminance[j] / 0.299;        // RED
+            data[i + 1] = this.luminance[j] / 0.587;    // GREEN
+            data[i + 2] = this.luminance[j] / 0.114;    // BLUE
+            data[i + 3] = this.alpha[j];
+        }
+    
+        context.putImageData(imgData, imageX, imageY);
+    }
+
+    drawBlueChrominanceComponent() {
+        let context = createCanvas();
+    
+        let imageX = 0;
+        let imageY = 0;
+    
+        let imgData = context.createImageData(width, height);
+        let data = imgData.data;
+     
+        for(var i=0, j=0, n = this.blueChrominance.length; j < n; i+=4, j++) {
+            data[i] = this.blueChrominance[j] / -0.14713;        // RED
+            data[i + 1] = this.blueChrominance[j] / -0.28886;    // GREEN
+            data[i + 2] = this.blueChrominance[j] / 0.436;    // BLUE
+            data[i + 3] = this.alpha[j];
+        }
+    
+        context.putImageData(imgData, imageX, imageY);
+    }
+
+    drawRedChrominanceComponent() {
+        let context = createCanvas();
+    
+        let imageX = 0;
+        let imageY = 0;
+    
+        let imgData = context.createImageData(width, height);
+        let data = imgData.data;
+     
+        for(var i=0, j=0, n = this.redChrominance.length; j < n; i+=4, j++) {
+            data[i] = this.redChrominance[j] / 0.615;        // RED
+            data[i + 1] = this.redChrominance[j] / -0.51499;    // GREEN
+            data[i + 2] = this.redChrominance[j] / -0.10001;    // BLUE
+            data[i + 3] = this.alpha[j];
+        }
+    
+        context.putImageData(imgData, imageX, imageY);
     }
 }

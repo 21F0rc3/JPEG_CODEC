@@ -6,15 +6,21 @@
  * @author Gabriel Fernandes 16/04/2022
  */
  function startEncoder(imageObj) {
+    // Imagem original
     let context = drawImageFromImage(imageObj);
     let rgb_data = ImageData.getImageDataFromImage(context).toRGB();
 
     let chrominanceData = colorSpaceConversion(rgb_data);
-
-    chrominanceData.toRGB().toImageData().drawImage();
-    //ChrominanceComponent.drawImage(chrominanceData);
     
-    //chrominanceDownsampling(chrominanceData);
+    // Resultado após o ColorSpaceConversion
+    chrominanceData.drawLuminanceComponent();
+    chrominanceData.drawBlueChrominanceComponent();
+    chrominanceData.drawRedChrominanceComponent();
+
+    let downsampledComponent = chrominanceDownsampling(chrominanceData);
+
+    // Resultado final apos o chrominance downsampling
+    downsampledComponent.toRGB().toImageData().drawImage();
 }
 
 /**
@@ -51,8 +57,7 @@ function chrominanceDownsampling(chrominanceData) {
 
     let downsampledComponent = new ChrominanceComponent(chrominanceData.luminance, blueChrominanceComponent, redChrominanceComponent, chrominanceData.alpha); 
     
-    ChrominanceComponent.drawImage(downsampledComponent);
-    //console.log(blueChrominanceComponent.length + " " + chrominanceData.alpha.length);
+    return downsampledComponent;
 }
 
 /**
@@ -65,7 +70,6 @@ function chrominanceDownsampling(chrominanceData) {
 function divideComponentImage(chrominanceData) {
     const dividedChrominanceComponent = [];
     
-
     for(let i = 0, j = 0, n = chrominanceData.length; i < n; i+=4, j++) {
         dividedChrominanceComponent[j] = (chrominanceData[i] + chrominanceData[i + 1] + chrominanceData[i + 2] + chrominanceData[i + 3]) / 4; 
     }
@@ -73,6 +77,14 @@ function divideComponentImage(chrominanceData) {
     return dividedChrominanceComponent;
 }
 
+/**
+ * Pega no componente dividido 1/4, e aumenta os pixeis de modo a este ter
+ * o tamanho original 1
+ * 
+ * @param {} chrominanceComponent - Componente cromatico dividido
+ * 
+ * @returns Componente cromatico na escala 1:1 
+ */
 function rescaleComponentImage(chrominanceComponent) {
     const rescaledComponentImage = [];
 
