@@ -36,14 +36,19 @@ class ChrominanceComponent {
         const red = [], green = [], blue = [], alpha = [];
 
         // Itera os pixeis da imagem
-        for(let i = 0, n = this.luminance.length; i<n; i++) {
-            //console.log(red + " " + green + " " + blue + " " + alpha);
+        for(let r = 0; r < this.rowSize(); r++) {
+            red[r] = [];
+            green[r] = [];
+            blue[r] = [];
+            alpha[r] = [];
 
-            // Converte para os pixeis RGB
-            red[i] = 1 * this.luminance[i] + 0 * this.blueChrominance[i] + 1.13983 * this.redChrominance[i];
-            green[i] = 1 * this.luminance[i] - 0.39465 * this.blueChrominance[i] - 0.58060 * this.redChrominance[i];
-            blue[i] = 1 * this.luminance[i] + 2.03211 * this.blueChrominance[i];
-            alpha[i] = this.alpha[i];
+            for(let c = 0; c < this.columnSize(); c++) {
+                // Converte para os pixeis RGB
+                red[r][c] = 1 * this.luminance[r][c] + 0 * this.blueChrominance[r][c] + 1.13983 * this.redChrominance[r][c];
+                green[r][c] = 1 * this.luminance[r][c] - 0.39465 * this.blueChrominance[r][c] - 0.58060 * this.redChrominance[r][c];
+                blue[r][c] = 1 * this.luminance[r][c] + 2.03211 * this.blueChrominance[r][c];
+                alpha[r][c] = this.alpha[r][c];
+            }
         }
 
         return new RGB(red, green, blue, alpha);
@@ -58,13 +63,21 @@ class ChrominanceComponent {
         let imgData = context.createImageData(width, height);
         let data = imgData.data;
      
-        for(var i=0, j=0, n = this.luminance.length; j < n; i+=4, j++) {
-            data[i] = this.luminance[j] / 0.299;        // RED
-            data[i + 1] = this.luminance[j] / 0.587;    // GREEN
-            data[i + 2] = this.luminance[j] / 0.114;    // BLUE
-            data[i + 3] = this.alpha[j];
-        }
-    
+        let i = 0;
+
+        for(let r = 0; r < this.luminance.length; r++) {
+            for(let c = 0; c < this.luminance[r].length; c++) {
+                data[i] = this.luminance[r][c] / 0.299;    // RED
+                data[i + 1] = this.luminance[r][c] / 0.587; // GREEN
+                data[i + 2] = this.luminance[r][c] / 0.114; // BLUE
+                data[i + 3] = this.alpha[r][c];
+
+                //console.log("R: "+data[i]+"G: "+data[i+1]+"B: "+data[i+2]+"A: "+data[i+3]);
+
+                i += 4;
+            }
+        } 
+
         context.putImageData(imgData, imageX, imageY);
     }
 
@@ -104,5 +117,13 @@ class ChrominanceComponent {
         }
     
         context.putImageData(imgData, imageX, imageY);
+    }
+
+    rowSize() {
+        return this.luminance.length;
+    }
+
+    columnSize() {
+        return this.luminance[0].length;
     }
 }

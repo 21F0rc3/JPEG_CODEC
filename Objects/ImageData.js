@@ -50,9 +50,7 @@ class ImageData {
     
         let imgData = context.createImageData(width, height);
         let data = imgData.data;
-    
-        console.log(this.data.length);
-    
+
         for(var i=0, n = this.data.length * 4; i < n; i++) {
             data[i] = this.data[i];
         }
@@ -66,20 +64,37 @@ class ImageData {
      * Ao inves de termos um array em que cada 4 indices
      * representam 1 pixel, temos 4 arrays diferentes para cada cor(e o alpha)
      * 
+     * Outra diferença e que passamos a ter um array multidimensional
+     * que representa a grelha de pixeis da imagem ou seja teremos row e cols
+     * na row = 0, col = 3 teremos um pixel. 
+     * 
      * @returns Novo objeto RGB com as informações da imagem
      * 
      * @author Gabriel Fernandes 18/04/2022 
      */
     toRGB() {
-        let red =[], green = [], blue = [], alpha = [];
-    
-        for(let i=0, j=0; j< this.data.length; i++, j+=4) {
-            red[i] = this.data[j];
-            green[i] = this.data[j + 1];
-            blue[i] = this.data[j + 2];
-            alpha[i] = this.data[j + 3];
+        // Arrays 2D
+        let red = [new Array()], green = [new Array()], blue = [new Array()], alpha = [new Array()];
+
+        let i=0;
+
+        for(let r=0; r<height; r++) {
+            // Cria um novo array no indice na nova row
+            red[r] = [];
+            green[r] = [];
+            blue[r] = [];
+            alpha[r] = [];
+
+            for(let c=0; c<width; c++) {
+                red[r][c] = this.data[i];
+                green[r][c] = this.data[i + 1];
+                blue[r][c] = this.data[i + 2];
+                alpha[r][c] = this.data[i + 3];
+            
+                i+=4;
+            }
         }
-    
+
         return new RGB(red, green, blue, alpha);
     }
 }

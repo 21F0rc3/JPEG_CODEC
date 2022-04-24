@@ -39,19 +39,24 @@ class RGB{
         const Y = [], Cb = [], Cr = [], A = [];
 
         // Itera os pixeis da imagem
-        for(var i = 0, n = this.red.length; i<n; i++) {
-            //console.log(red + " " + green + " " + blue + " " + alpha);
+        for(let r = 0; r < this.red.length; r++) {
+            Y[r] = [];
+            Cb[r] = [];
+            Cr[r] = [];
+            A[r] = [];
 
-            // Converte para os pixeis cromaticos
-            let luminance = (0.299 * this.red[i]) + (0.587 * this.green[i]) + (0.114 * this.blue[i]);
-            let blueChrominance = (-0.14713 * this.red[i]) + (-0.28886 * this.green[i]) + (0.436 * this.blue[i]);
-            let redChrominance = (0.615 * this.red[i]) + (-0.51499 * this.green[i]) + (-0.10001 * this.blue[i]);
+            for(let c = 0; c < this.red[r].length; c++) {
+                // Converte para os pixeis cromaticos
+                let luminance = (0.299 * this.red[r][c]) + (0.587 * this.green[r][c]) + (0.114 * this.blue[r][c]);
+                let blueChrominance = (-0.14713 * this.red[r][c]) + (-0.28886 * this.green[r][c]) + (0.436 * this.blue[r][c]);
+                let redChrominance = (0.615 * this.red[r][c]) + (-0.51499 * this.green[r][c]) + (-0.10001 * this.blue[r][c]);
 
-            // Adiciona aos arrays
-            Y[i] = luminance;
-            Cb[i] = blueChrominance;
-            Cr[i] = redChrominance;
-            A[i] = this.alpha[i];
+                // Adiciona aos arrays
+                Y[r][c] = luminance;
+                Cb[r][c] = blueChrominance;
+                Cr[r][c] = redChrominance;
+                A[r][c] = this.alpha[r][c];
+            }
         }
 
         return new ChrominanceComponent(Y,Cb,Cr,A);
@@ -65,19 +70,33 @@ class RGB{
      * 
      * @returns objeto ImageData com a informação da imagem
      * 
-     * @author Gabriel Fernandes 
+     * @author Gabriel Fernandes 21/04/2022
      */
     toImageData() {
         const imageData = [];
 
+        let i=0;
+
         // Itera os pixeis da imagem
-        for(var i = 0, j = 0, n = this.red.length; j<n; i+=4, j++) {
-           imageData[i] = this.red[j];
-           imageData[i + 1] = this.green[j];
-           imageData[i + 2] = this.blue[j];
-           imageData[i + 3] = this.alpha[j];
+        for(let r = 0; r < this.red.length; r++) {
+            for(let c = 0; c < this.red[r].length; c++) {
+                imageData[i] = this.red[r][c];
+                imageData[i + 1] = this.green[r][c];
+                imageData[i + 2] = this.blue[r][c];
+                imageData[i + 3] = this.alpha[r][c];
+
+                i+=4;
+            }
         }
 
         return new ImageData(imageData);
+    }
+
+    rowSize() {
+        return this.red.length;
+    }
+
+    columnSize() {
+        return this.red[0].length;
     }
 }
