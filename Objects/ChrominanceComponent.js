@@ -14,14 +14,19 @@ class ChrominanceComponent {
      * 
      * @author Gabriel Fernandes 17/04/2022
      */
-    constructor(luminance = [], blueChrominance = [], redChrominance = [], alpha = []) {
+    constructor(width, heigth, luminance = [], blueChrominance = [], redChrominance = [], alpha = []) {
+        this.width = width;
+        this.height = heigth;
         this.luminance = luminance;
         this.blueChrominance = blueChrominance;
         this.redChrominance = redChrominance;
         this.alpha = alpha;
     }
 
+
     /**
+     * @deprecated
+     * 
      * Converte um objeto ChrominanceComponent para RGB
      * 
      * É o responsavel pelo processo inverso do Color Space Conversion,
@@ -33,25 +38,20 @@ class ChrominanceComponent {
      * @author Gabriel Fernandes 18/04/2022
      */
     toRGB() {
-        const red = [], green = [], blue = [], alpha = [];
+        const red = [];
+        const blue = [];
+        const green = [];
+        const alpha = [];
 
-        // Itera os pixeis da imagem
-        for(let r = 0; r < this.rowSize(); r++) {
-            red[r] = [];
-            green[r] = [];
-            blue[r] = [];
-            alpha[r] = [];
-
-            for(let c = 0; c < this.columnSize(); c++) {
-                // Converte para os pixeis RGB
-                red[r][c] = 1 * this.luminance[r][c] + 0 * this.blueChrominance[r][c] + 1.13983 * this.redChrominance[r][c];
-                green[r][c] = 1 * this.luminance[r][c] - 0.39465 * this.blueChrominance[r][c] - 0.58060 * this.redChrominance[r][c];
-                blue[r][c] = 1 * this.luminance[r][c] + 2.03211 * this.blueChrominance[r][c];
-                alpha[r][c] = this.alpha[r][c];
-            }
+        for(let i = 0; i < (this.width * this.height); i++) {
+            // Converte para os pixeis RGB
+            red[i] = 1 * this.luminance[i] + 0 * this.blueChrominance[i] + 1.13983 * this.redChrominance[i];
+            green[i] = 1 * this.luminance[i] - 0.39465 * this.blueChrominance[i] - 0.58060 * this.redChrominance[i];
+            blue[i] = 1 * this.luminance[i] + 2.03211 * this.blueChrominance[i];
+            alpha[i] = this.alpha[i];
         }
 
-        return new RGB(red, green, blue, alpha);
+        return new RGB(this.width, this.height, red, green, blue, alpha);
     }
 
     drawLuminanceComponent() {
@@ -125,5 +125,21 @@ class ChrominanceComponent {
 
     columnSize() {
         return this.luminance[0].length;
+    }
+
+    toBinary() {
+        let binaryData = "";
+
+        for(let r = 0; r < 1; r++) {
+            for(let c = 0; c < 1; c++) {
+                // Converte decimal para binario
+                for(let n = this.luminance[r][c]; n > 0; n=n/2) {    
+                    binaryData += ""+n%2; 
+                }  
+
+            }
+        }
+
+        return binaryData;
     }
 }

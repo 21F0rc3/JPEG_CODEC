@@ -74,27 +74,15 @@ class ImageData {
      */
     toRGB() {
         // Arrays 2D
-        let red = [new Array()], green = [new Array()], blue = [new Array()], alpha = [new Array()];
+        let red = [], green = [], blue = [], alpha = [];
 
-        let i=0;
-
-        for(let r=0; r<height; r++) {
-            // Cria um novo array no indice na nova row
-            red[r] = [];
-            green[r] = [];
-            blue[r] = [];
-            alpha[r] = [];
-
-            for(let c=0; c<width; c++) {
-                red[r][c] = this.data[i];
-                green[r][c] = this.data[i + 1];
-                blue[r][c] = this.data[i + 2];
-                alpha[r][c] = this.data[i + 3];
-            
-                i+=4;
-            }
+        for(let i=0, j=0; i < (height * width); i++, j+=4) {
+                red[i] = this.data[j];
+                green[i] = this.data[j + 1];
+                blue[i] = this.data[j + 2];
+                alpha[i] = this.data[j + 3];
         }
 
-        return new RGB(red, green, blue, alpha);
+        return new RGB(height, width, red, green, blue, alpha);
     }
 }

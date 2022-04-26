@@ -1,0 +1,125 @@
+const PREDICTOR_TABLE_MODE = 0;
+
+/**
+ * Differential pulse code modulation is a technique of analog to digital 
+ * signal conversion. This technique samples the analog signal and then 
+ * quantizes the difference between the sampled value and its predicted value, 
+ * then encodes the signal to form a digital value.
+ * 
+ * @param {*} image - Image a ser codificada
+ *  
+ * @returns Array 2D [signal_error]
+ * 
+ * @author Gabriel Fernandes 25/04/2022 
+ */
+function dpcm_encode(data) {
+    let encoded_data = [];
+
+    let sample_value = 0;
+    let prediction_value = 0;
+    let signal_error = 0;
+
+    for(let i = 0; i < data.length; i++) {        
+        sample_value = data[i];
+
+        // Diferença entre o valor previsto e o valor real
+        signal_error = sample_value - prediction_value;
+
+        // Pixel codificado
+        encoded_data[i] = signal_error;
+
+        // Valor baseado nos pixeis vizinhos
+        prediction_value = predictor(encoded_data, i);
+    }
+
+    return encoded_data;
+}
+
+function dpcm_decode(data) {
+    let decoded_data = [];
+
+    let sample_value = 0;
+    let prediction_value = 0;
+    let signal_error = 0;
+
+    for(let i = 0; i < data.length; i++) {
+        signal_error = data[i];
+
+        sample_value = signal_error + prediction_value;
+
+        decoded_data[i] = sample_value;
+        console.log(sample_value);
+
+        prediction_value = predictor(decoded_data, i);
+    }
+
+    return decoded_data;
+}
+
+/**
+ * Prevê um valor baseado nos pixeis vizinhos
+ * 
+ * @param {*} encoded_image - imagem codificada 
+ * @param {*} row - linha do pixel atual
+ * @param {*} column - coluna do pixel atual
+ * 
+ * @returns Valor previsto baseado nos pixeis vizinhos
+ * 
+ * @author Gabriel Fernandes 25/04/2022
+ */
+function predictor(encoded_data, index) {
+    // Se o X estiver num dos limites da imagem, então os pixeis vizinhos terão de ser zero
+    let A = index - 1 >= 0 ? encoded_data[index-1] : 0;
+    let B = index - width >= 0 ? encoded_data[index-width] : 0;
+    let C = index - width - 1 >= 0 ? encoded_data[index-width-1] : 0;
+
+    return prediction_table(A,B,C);
+}
+
+/**
+ * Tabela de previsão
+ * 
+ *    C | B
+ *   ---|---
+ *    A | X
+ * 
+ * @param {*} A - Pixel vizinho 
+ * @param {*} B - Pixel vizinho
+ * @param {*} C - Pixel vizinho
+ * 
+ * @returns Valor previsto baseado nos pixeis vizinhos
+ * 
+ * @author Gabriel Fernandes 25/04/2022
+ */
+function prediction_table(A,B,C) {
+    switch(PREDICTOR_TABLE_MODE) {
+        case 0: {
+            return 0;
+        }
+        case 1: {
+            return A;
+        }
+        case 2: {
+            return B;
+        }
+        case 3: {
+            return C;
+        }
+        case 4: {
+            return A + B - C;
+        }
+        case 5: {
+            return A + (B - C)/2;
+        }
+        case 6: {
+            return B + (A - C)/2;
+        }
+        case 7: {
+            return (A + B)/2;
+        }
+        default: {
+            console.log("DPCM_encoder.predictor_table(): Mode "+PREDICTOR_TABLE_MODE+" não é um modo valido!");
+            return null;
+        }
+    }
+}

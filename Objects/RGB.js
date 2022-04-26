@@ -16,7 +16,9 @@
  * @author Gabriel Fernandes 18/04/2022
  */
 class RGB{
-    constructor(red = [], green = [], blue = [], alpha = []) {
+    constructor(width, heigth, red = [], green = [], blue = [], alpha = []) {
+        this.width = width;
+        this.heigth = heigth;
         this.red = red;
         this.green = green;
         this.blue = blue;
@@ -36,30 +38,28 @@ class RGB{
      * @author Gabriel Fernandes 18/04/2022
      */
     toChrominanceComponent() {
-        const Y = [], Cb = [], Cr = [], A = [];
+        const Y = [];
+        const Cb = [];
+        const Cr = [];
+        const A = [];
+
+        console.log(this.red[0]);
 
         // Itera os pixeis da imagem
-        for(let r = 0; r < this.red.length; r++) {
-            Y[r] = [];
-            Cb[r] = [];
-            Cr[r] = [];
-            A[r] = [];
-
-            for(let c = 0; c < this.red[r].length; c++) {
-                // Converte para os pixeis cromaticos
-                let luminance = (0.299 * this.red[r][c]) + (0.587 * this.green[r][c]) + (0.114 * this.blue[r][c]);
-                let blueChrominance = (-0.14713 * this.red[r][c]) + (-0.28886 * this.green[r][c]) + (0.436 * this.blue[r][c]);
-                let redChrominance = (0.615 * this.red[r][c]) + (-0.51499 * this.green[r][c]) + (-0.10001 * this.blue[r][c]);
-
-                // Adiciona aos arrays
-                Y[r][c] = luminance;
-                Cb[r][c] = blueChrominance;
-                Cr[r][c] = redChrominance;
-                A[r][c] = this.alpha[r][c];
-            }
+        for(let i = 0; i < (this.width * this.heigth); i++) {
+            // Converte para os pixeis cromaticos
+            let luminance = (0.299 * this.red[i]) + (0.587 * this.green[i]) + (0.114 * this.blue[i]);
+            let blueChrominance = (-0.14713 * this.red[i]) + (-0.28886 * this.green[i]) + (0.436 * this.blue[i]);
+            let redChrominance = (0.615 * this.red[i]) + (-0.51499 * this.green[i]) + (-0.10001 * this.blue[i]);
+            let alpha = this.alpha[i];
+                
+            Y[i] = luminance;
+            Cb[i] = blueChrominance;
+            Cr[i] = redChrominance;
+            A[i] = alpha;
         }
 
-        return new ChrominanceComponent(Y,Cb,Cr,A);
+        return new ChrominanceComponent(this.width, this.heigth, Y, Cb, Cr, A);
     }
 
     /**
@@ -75,28 +75,14 @@ class RGB{
     toImageData() {
         const imageData = [];
 
-        let i=0;
-
         // Itera os pixeis da imagem
-        for(let r = 0; r < this.red.length; r++) {
-            for(let c = 0; c < this.red[r].length; c++) {
-                imageData[i] = this.red[r][c];
-                imageData[i + 1] = this.green[r][c];
-                imageData[i + 2] = this.blue[r][c];
-                imageData[i + 3] = this.alpha[r][c];
-
-                i+=4;
-            }
+        for(let i = 0, j = 0; i < (this.width * this.heigth); i++, j+=4) {
+                imageData[j] = this.red[i];
+                imageData[j + 1] = this.green[i];
+                imageData[j + 2] = this.blue[i];
+                imageData[j + 3] = this.alpha[i];
         }
-
+        
         return new ImageData(imageData);
-    }
-
-    rowSize() {
-        return this.red.length;
-    }
-
-    columnSize() {
-        return this.red[0].length;
     }
 }
