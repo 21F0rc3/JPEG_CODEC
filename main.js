@@ -16,13 +16,13 @@ function main(imageObj) {
     /////////////////////////////
 
     // Codifica por DPCM
-    let encoded_image = dpcm_encode(source_image.luminance);
+    let residual_data = dpcm_encode(source_image.luminance);
     
     // Processamento JPEG
-    let helper_stream = jpeg_processing(encoded_image);
+    let processingResults = jpeg_processing(residual_data);
 
-    let category_array = helper_stream[0];
-    let signal_error_array = helper_stream[1];
+    let category_array = processingResults.categories;
+    let signal_error_array = processingResults.residuals;
 
     //Passa so o array de categorias e codifica por Huffman
     let Huffman_encoding = new huffmanTree(category_array);
