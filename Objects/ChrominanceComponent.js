@@ -1,9 +1,11 @@
+import {RGB} from "./RGB.js";
+
 /**
  * Classe reponsavel pelos Componentes Cromaticos
  * 
  * @author Gabriel Fernandes 17/04/2022
  */
-class ChrominanceComponent {
+export class ChrominanceComponent {
     /**
      * Construtor de um pixel do component cromatico.
      * 
@@ -25,7 +27,7 @@ class ChrominanceComponent {
 
 
     /**
-     * @deprecated
+     * #@deprecated
      * 
      * Converte um objeto ChrominanceComponent para RGB
      * 

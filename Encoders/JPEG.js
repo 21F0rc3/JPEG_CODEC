@@ -1,13 +1,11 @@
-function jpeg_processing(encoded_image) {
-    let category_array = [];
-    let signal_error_array = [];
+export function jpeg_processing(encoded_image) {
+    let residual_category_array = [];
 
     for (let i = 0; i < encoded_image.length; i++) {
-        category_array[i] = getResidualCategory(encoded_image[i]);
-        signal_error_array[i] = encoded_image[i];
+        residual_category_array[i] = getResidualCategory(encoded_image[i]);
     }
 
-    return {categories: category_array, residuals: signal_error_array,};
+    return residual_category_array;
 }
 
 function getResidualCategory(residual) {
@@ -21,7 +19,8 @@ function getResidualCategory(residual) {
     for (let i = 1; i < 16; i++) {
         const categoryUpperLimit = (2 ** i) - 1;
         const categoryLowerLimit = (2 ** (i - 1)) - 1;
-        if ((residual > -categoryUpperLimit && residual < -categoryLowerLimit) || (residual < categoryUpperLimit && residual > categoryLowerLimit)) {
+
+        if ((residual >= -categoryUpperLimit && residual <= -categoryLowerLimit) || (residual <= categoryUpperLimit && residual >= categoryLowerLimit)) {
             return i;
         }
     }

@@ -1,4 +1,6 @@
-const PREDICTOR_TABLE_MODE = 0;
+import { width, height } from "../Utils/ImageUtils.js";
+
+const PREDICTOR_TABLE_MODE = 7;
 
 /**
  * Differential pulse code modulation is a technique of analog to digital
@@ -12,8 +14,8 @@ const PREDICTOR_TABLE_MODE = 0;
  *
  * @author Gabriel Fernandes 25/04/2022
  */
-function dpcm_encode(data) {
-    let encoded_data = [];
+export function dpcm_encode(data) {
+    let residualArray = [];
 
     let sample_value = 0;
     let prediction_value = 0;
@@ -25,17 +27,17 @@ function dpcm_encode(data) {
         // Diferença entre o valor previsto e o valor real
         residual = sample_value - prediction_value;
 
-        // Pixel codificado
-        encoded_data[i] = residual;
+        // Pixel codificado. OBS: Arredondado para baixo!
+        residualArray[i] = Math.floor(residual);
 
         // Valor baseado nos pixeis vizinhos
-        prediction_value = predictPixel(encoded_data, i);
+        prediction_value = predictPixel(residualArray, i);
     }
 
-    return encoded_data;
+    return residualArray;
 }
 
-function dpcm_decode(data) {
+export function dpcm_decode(data) {
     let decoded_data = [];
 
     let sample_value = 0;
