@@ -1,3 +1,8 @@
+import { width, height } from "../Utils/ImageUtils.js";
+import { RGB } from "./RGB.js";
+import { ChrominanceComponent } from "./ChrominanceComponent.js";
+import {createCanvas} from "../Utils/ImageUtils.js";
+
 /**
  * Class ImageData
  * 
@@ -15,7 +20,7 @@
  * 
  * @author Gabriel Fernandes 18/04/2022
  */
-class ImageData {
+export class ImageData {
     constructor(data = []) {
         this.data = data;
     } 
@@ -33,7 +38,7 @@ class ImageData {
     static getImageDataFromImage(context) {
         let imageData = context.getImageData(0, 0, width, height);
         let data = imageData.data;
-    
+
         return new ImageData(data);
     }
 

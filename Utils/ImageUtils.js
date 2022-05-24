@@ -1,7 +1,7 @@
-const width = 200;
-const height = 100;
+export const width = 200;
+export const height = 100;
 
-function createCanvas() {
+export function createCanvas() {
     let canvas = document.createElement("canvas");
 
     canvas.width = width;
@@ -16,7 +16,7 @@ function createCanvas() {
     return context;
 }
 
-function drawImageFromImage(imageObj) {
+export function drawImageFromImage(imageObj) {
     let canvas = document.createElement("canvas");
 
     canvas.width = width;

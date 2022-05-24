@@ -7,7 +7,7 @@ class Node {
     }  
 }
 //Huffman coding is a compression algorithm that represents a string sequence in binary  
-class huffmanTree{  
+export class huffmanTree{
     constructor(array){  
         //The first step is to count the frequency of characters  
         let hash = {};  
@@ -59,17 +59,18 @@ class huffmanTree{
         //Generated Huffman tree  
         return forest[0];  
     }  
-  
-    //Traverse the Huffman tree and return a table of original characters and binary codes  
+
+    //Traverse the Huffman tree and return a table of original characters and binary codes
+    /** @return {Map} */
     getHuffmanCode(tree){  
-        let hash = {}; // cross reference table
+        let hash = new Map(); // cross reference table
         let traversal = (node, curPath) => {  
             if (!node.length && !node.right) return;  
-            if (node.left && !node.left.left && !node.left.right){  
-                hash[node.left.char] = curPath + '0';  
+            if (node.left && !node.left.left && !node.left.right){
+                hash.set(node.left.char, curPath + '0')
             }  
             if (node.right && !node.right.left && !node.right.right){  
-                hash[node.right.char] = curPath + '1';  
+                hash.set(node.right.char, curPath + '1')
             }  
             //Traverse to the left and add 0 to the path  
             if(node.left){  

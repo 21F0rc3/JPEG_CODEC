@@ -1,4 +1,4 @@
-class Binary {
+export class Binary {
     static convertDecimal(decimal) {
         // Array temporario para guardar o numero convertido
         let temp = [];
