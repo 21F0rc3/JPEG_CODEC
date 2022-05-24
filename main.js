@@ -30,7 +30,7 @@ function main(imageObj) {
 
     let JPEG_IMAGE = JPEG_Stream.create(width, height, category_array, signal_error_array, map); 
     
-    //console.log(JPEG_IMAGE.jpeg_stream);
+    console.log(JPEG_IMAGE.jpeg_stream);
 
     //////////////////////////////
     //      DESCOMPRESSÃO       //
