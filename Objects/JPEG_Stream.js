@@ -1,5 +1,5 @@
 import {Binary} from "./Binary.js";
-import {dpcm_encode} from "../Encoders/DPCM.js";
+import {dpcm_decode, dpcm_encode} from "../Encoders/DPCM.js";
 import {jpeg_processing} from "../Encoders/JPEG.js";
 import {huffmanTree} from "../Encoders/Huffman.js";
 import {height, width} from "../Utils/ImageUtils.js";
@@ -119,7 +119,9 @@ export class JPEG_LS {
         let decompressedCb = decompressComponent(compressedData.blueChrominance);
         let decompressedCr = decompressComponent(compressedData.redChrominance);
 
-        compressedImage.setComponents(decompressedLuminance, decompressedCr, decompressedCb);
+        let decompressedImage = new ChrominanceComponent(width, height, decompressedLuminance, decompressedCb, decompressedCr, compressedImage.sourceChrominanceComponent.alpha);
+
+        return decompressedImage;
     }
 
     /**
@@ -159,7 +161,9 @@ class CompressedData {
 function compressComponent(originalComponent) {
     // DPCM
     let residualArray = dpcm_encode(originalComponent);
-    // Processamento JPEG
+
+
+   // Processamento JPEG
     let residualCategories = jpeg_processing(residualArray);
 
     //Passa so o array de categorias e codifica por Huffman
@@ -168,11 +172,67 @@ function compressComponent(originalComponent) {
 
     let compressedData = "";
 
-    for (let i = 0; i < residualArray.length; i++) {
-        compressedData += huffmanMap.get(residualCategories[i].toString()) + dec2bin(residualArray[i]);
+    for (let i = 0; i < residualCategories.length; i++) {
+        let key = residualCategories[i];
+
+        //console.log(residualCategories[i]);
+
+        if(key == 0) { // Se for zero não colocamos nem sequer um bit
+            compressedData += huffmanMap.get(key.toString());
+        }else {
+            compressedData += huffmanMap.get(key.toString()) + convertToBinary(residualArray[i]);
+        }
     }
 
     return {compressedData: compressedData, huffmanMap: huffmanMap, residualArray: residualArray};
+}
+
+function convertToBinary(number) {
+    let binaryNumber;
+
+    if(number < 0) { // Se for negativo faz complemento
+        binaryNumber = dec2bin(Math.abs(number));
+        let bitsSteam = "";
+
+        for(let i=0; i<binaryNumber.length; i++) {
+            if(binaryNumber[i] == 1) {
+                bitsSteam += '0';
+            }else{
+                bitsSteam += '1';
+            }
+        }
+
+        binaryNumber = bitsSteam;
+    }else {
+        binaryNumber = dec2bin(number);
+    }
+
+    return binaryNumber;
+}
+
+function convertToDecimal(binaryNumber) {
+    let isNegativeNumber = false;
+
+    if(binaryNumber[0] == 0) { // Se o primeiro numero for 0, e um numero com complemento
+        let bitStream = "";
+        isNegativeNumber = true;
+
+        for(let i=0; i<binaryNumber.length; i++) {
+            if(binaryNumber[i] == 0) {
+                bitStream += '1';
+            }else{
+                bitStream += '0';
+            }
+        }
+
+        binaryNumber = bitStream;
+    }
+
+    let decimalNumber = parseInt(binaryNumber, 2);
+
+    //console.log(decimalNumber);
+
+    return isNegativeNumber == true ? -decimalNumber : decimalNumber;
 }
 
 /**
@@ -204,15 +264,18 @@ function decompressComponent(compressedComponent) {
             for (let j = 0; j < residualCategory; j++) {
                 currentResidualElement += compressedData[++i];
             }
-
-            decompressedData.push(parseInt(currentResidualElement, 2));
+            //console.log(residualCategory +"     "+currentResidualElement);
+            decompressedData.push(convertToDecimal(currentResidualElement));
 
             currentResidualElement = "";
             currentTryForHuffman = "";
         }
     }
 
-    return decompressedData;
+    console.log(decompressedData);
+    
+    // Descomprime no codificador diferencial 
+    return dpcm_decode(compressedComponent.residualArray);
 }
 
 /**

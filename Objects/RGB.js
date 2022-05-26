@@ -52,7 +52,7 @@ export class RGB {
         const Cr = [];
         const A = [];
 
-        console.log(this.red[0]);
+        //console.log(this.red[0]);
 
         // Itera os pixels da imagem
         for (let i = 0; i < (this.width * this.heigth); i++) {

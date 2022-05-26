@@ -11,7 +11,8 @@ let imageObj = new Image();
 imageObj.onload = function () {
     main(this);
 }
-imageObj.src = "Horario.PNG";
+//imageObj.src = "Horario.PNG";
+imageObj.src = "teste.jpg";
 
 function main(imageObj) {
     // Imagem original
@@ -21,8 +22,8 @@ function main(imageObj) {
     let sourceChrominanceComponent = sourceImageData.toRGB().toChrominanceComponent();
 
     console.log("original luminance", {
-        Y: sourceChrominanceComponent.luminance,
-        Cr: sourceChrominanceComponent.redChrominance,
+        //Y: sourceChrominanceComponent.luminance,
+        //Cr: sourceChrominanceComponent.redChrominance,
         Cb: sourceChrominanceComponent.blueChrominance
     });
 
@@ -32,8 +33,8 @@ function main(imageObj) {
 
     let compressedImageData = compress(sourceChrominanceComponent)
     console.log("compressed luminance", {
-        Y: sourceChrominanceComponent.luminance,
-        Cr: sourceChrominanceComponent.redChrominance,
+        //Y: sourceChrominanceComponent.luminance,
+        //Cr: sourceChrominanceComponent.redChrominance,
         Cb: sourceChrominanceComponent.blueChrominance
     });
     console.log("compressed data", {encodedImage: compressedImageData.compressedData})
@@ -45,14 +46,11 @@ function main(imageObj) {
     //      DESCOMPRESSÃO       //
     //////////////////////////////
 
-    decompress(compressedImageData);
-    console.log("decompressed luminance", {
-        Y: sourceChrominanceComponent.luminance,
-        Cr: sourceChrominanceComponent.redChrominance,
-        Cb: sourceChrominanceComponent.blueChrominance
-    });
+    let decompressedImageData = decompress(compressedImageData);
 
-    sourceChrominanceComponent.toRGB().toImageData().drawImage();
+    console.log(decompressedImageData);
+
+    decompressedImageData.toRGB().toImageData().drawImage();
 }
 
 /**
@@ -65,5 +63,5 @@ function compress(source_image) {
 }
 
 function decompress(compressedImage) {
-    JPEG_LS.decompress(compressedImage);
+    return JPEG_LS.decompress(compressedImage);
 }

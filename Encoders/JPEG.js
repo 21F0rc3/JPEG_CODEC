@@ -3,7 +3,10 @@ export function jpeg_processing(encoded_image) {
 
     for (let i = 0; i < encoded_image.length; i++) {
         residual_category_array[i] = getResidualCategory(encoded_image[i]);
+       // console.log(encoded_image[i]+"    "+residual_category_array[i]);
     }
+
+    //console.log(residual_category_array);
 
     return residual_category_array;
 }

@@ -1,5 +1,6 @@
-export const width = 200;
-export const height = 100;
+export const width = 800;
+export const height = 400;
+
 
 export function createCanvas() {
     let canvas = document.createElement("canvas");

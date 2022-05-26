@@ -21,7 +21,7 @@ export class huffmanTree{
   
         let map = this.getHuffmanCode(this.huffmanTree);  
         //Look at the cross reference table, that is, what is the binary encoding of each character  
-        console.log(map);  
+        //console.log(map);  
   
         //Final binary encoding  
         this.binaryArray = this.getBinaryArray(map, array);  

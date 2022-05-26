@@ -16,6 +16,7 @@ const PREDICTOR_TABLE_MODE = 7;
  */
 export function dpcm_encode(data) {
     let residualArray = [];
+    let predictor = [];
 
     let sample_value = 0;
     let prediction_value = 0;
@@ -24,35 +25,46 @@ export function dpcm_encode(data) {
     for (let i = 0; i < data.length; i++) {
         sample_value = data[i];
 
+        // Valor baseado nos pixeis vizinhos
+        prediction_value = predictPixel(predictor, i);
+
         // Diferença entre o valor previsto e o valor real
         residual = sample_value - prediction_value;
 
         // Pixel codificado. OBS: Arredondado para baixo!
-        residualArray[i] = Math.floor(residual);
+        residualArray[i] = residual;//Math.floor(residual);
 
-        // Valor baseado nos pixeis vizinhos
-        prediction_value = predictPixel(residualArray, i);
+        predictor[i] = prediction_value + residual;
     }
+
+    console.log(residualArray);
 
     return residualArray;
 }
 
 export function dpcm_decode(data) {
     let decoded_data = [];
+    let predictor = [];
 
     let sample_value = 0;
     let prediction_value = 0;
     let signal_error = 0;
 
     for (let i = 0; i < data.length; i++) {
-        signal_error = data[i];
+        if(!data[i]) { // Se não existir é zero
+            signal_error = 0;
+        }else {
+            signal_error = data[i];
+        }
 
-        sample_value = signal_error + prediction_value;
+       //console.log(signal_error+"   "+prediction_value);
+        prediction_value = predictPixel(predictor, i);
+
+        sample_value = prediction_value + signal_error;
 
         decoded_data[i] = sample_value;
-        console.log(sample_value);
 
-        prediction_value = predictPixel(decoded_data, i);
+        predictor[i] = sample_value;
     }
 
     return decoded_data;
@@ -69,10 +81,17 @@ export function dpcm_decode(data) {
  * @author Gabriel Fernandes 25/04/2022
  */
 function predictPixel(encoded_data, index) {
+    let col = index;
+    while(col >= width) {
+        col -= width;
+    }
+
     // Se o X estiver num dos limites da imagem, então os pixeis vizinhos terão de ser zero
-    let A = index - 1 >= 0 ? encoded_data[index - 1] : 0;
+    let A = col - 1 >= 0 ? encoded_data[index - 1] : 0;
     let B = index - width >= 0 ? encoded_data[index - width] : 0;
     let C = index - width - 1 >= 0 ? encoded_data[index - width - 1] : 0;
+
+    //console.log("A: "+A+"  B: "+B+"   C: "+C+"    X: "+encoded_data[index]);
 
     return _getPredictionFromTable(A, B, C);
 }
