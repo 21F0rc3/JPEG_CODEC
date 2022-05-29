@@ -2,7 +2,7 @@ import {Binary} from "./Binary.js";
 import {dpcm_decode, dpcm_encode} from "../Encoders/DPCM.js";
 import {jpeg_processing} from "../Encoders/JPEG.js";
 import {huffmanTree} from "../Encoders/Huffman.js";
-import {height, width} from "../Utils/ImageUtils.js";
+import {drawImageFromImage, height, width} from "../Utils/ImageUtils.js";
 import {ChrominanceComponent} from "./ChrominanceComponent.js";
 
 export class JPEG_Stream {
@@ -56,13 +56,13 @@ export class JPEG_Stream {
             }
         }
 
-        console.log(signal_error_array);
+        //console.log(signal_error_array);
 
         return signal_error_array;
     }
 
     checkMapMatch(huffman_bits) {
-        console.log(this.huffman_map.length);
+        //console.log(this.huffman_map.length);
         for (let i = 0; i < 32; i++) {
             if (huffman_bits == this.huffman_map[i]) {
                 return i;
@@ -162,7 +162,6 @@ function compressComponent(originalComponent) {
     // DPCM
     let residualArray = dpcm_encode(originalComponent);
 
-
    // Processamento JPEG
     let residualCategories = jpeg_processing(residualArray);
 
@@ -175,11 +174,11 @@ function compressComponent(originalComponent) {
     for (let i = 0; i < residualCategories.length; i++) {
         let key = residualCategories[i];
 
-        //console.log(residualCategories[i]);
-
         if(key == 0) { // Se for zero não colocamos nem sequer um bit
+        //    console.log(residualArray[i]+"    "+huffmanMap.get(key.toString()));
             compressedData += huffmanMap.get(key.toString());
         }else {
+        //    console.log(residualArray[i]+"    "+huffmanMap.get(key.toString()) + convertToBinary(residualArray[i]));
             compressedData += huffmanMap.get(key.toString()) + convertToBinary(residualArray[i]);
         }
     }
@@ -272,7 +271,7 @@ function decompressComponent(compressedComponent) {
         }
     }
 
-    console.log(decompressedData);
+    //console.log(decompressedData);
     
     // Descomprime no codificador diferencial 
     return dpcm_decode(compressedComponent.residualArray);
@@ -324,7 +323,7 @@ function decodeImage() {
         }
     }
 
-    console.log(signal_error_array);
+    //console.log(signal_error_array);
 
     return signal_error_array;
 }

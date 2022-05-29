@@ -25,13 +25,13 @@ import {ImageData} from "./ImageData.js";
  * @author Gabriel Fernandes 18/04/2022
  */
 export class RGB {
-    constructor(width, height, red = [], green = [], blue = [], alpha = []) {
+    constructor(width, height, red = [], green = [], blue = []/*, alpha = []*/) {
         this.width = width;
         this.heigth = height;
         this.red = red;
         this.green = green;
         this.blue = blue;
-        this.alpha = alpha;
+      //  this.alpha = alpha;
     }
 
     /**
@@ -50,7 +50,7 @@ export class RGB {
         const Y = [];
         const Cb = [];
         const Cr = [];
-        const A = [];
+        //const A = [];
 
         //console.log(this.red[0]);
 
@@ -60,15 +60,14 @@ export class RGB {
             let luminance = (0.299 * this.red[i]) + (0.587 * this.green[i]) + (0.114 * this.blue[i]);
             let blueChrominance = (-0.14713 * this.red[i]) + (-0.28886 * this.green[i]) + (0.436 * this.blue[i]);
             let redChrominance = (0.615 * this.red[i]) + (-0.51499 * this.green[i]) + (-0.10001 * this.blue[i]);
-            let alpha = this.alpha[i];
+           // let alpha = this.alpha[i];
 
             Y[i] = luminance;
             Cb[i] = blueChrominance;
             Cr[i] = redChrominance;
-            A[i] = alpha;
         }
 
-        return new ChrominanceComponent(this.width, this.heigth, Y, Cb, Cr, A);
+        return new ChrominanceComponent(this.width, this.heigth, Y, Cb, Cr);
     }
 
     /**
@@ -89,7 +88,7 @@ export class RGB {
             imageData[j] = this.red[i];
             imageData[j + 1] = this.green[i];
             imageData[j + 2] = this.blue[i];
-            imageData[j + 3] = this.alpha[i];
+            imageData[j + 3] = 255;
         }
 
         return new ImageData(imageData);

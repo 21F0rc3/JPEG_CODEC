@@ -12,34 +12,53 @@ imageObj.onload = function () {
     main(this);
 }
 //imageObj.src = "Horario.PNG";
-imageObj.src = "teste.jpg";
+imageObj.src = "Horario.PNG";
 
-function main(imageObj) {
+
+var startButton = document.getElementById("start");
+
+startButton.onclick = function() {
+    main();
+}
+
+function main() {
+    // Vai buscar os dados da imagem que foi enviada
+    //let imageObj = new Image();
+    //imageObj = document.getElementById('sourceImage');
+
     // Imagem original
     let context = drawImageFromImage(imageObj);
 
     const sourceImageData = ImageData.getImageDataFromImage(context)
-    let sourceChrominanceComponent = sourceImageData.toRGB().toChrominanceComponent();
 
+    /*
     console.log("original luminance", {
-        //Y: sourceChrominanceComponent.luminance,
-        //Cr: sourceChrominanceComponent.redChrominance,
+        Y: sourceChrominanceComponent.luminance,
+        Cr: sourceChrominanceComponent.redChrominance,
         Cb: sourceChrominanceComponent.blueChrominance
-    });
+    });*/
 
     /////////////////////////////
     //      COMPRESSÃO         //
     /////////////////////////////
 
+    // Converte para Components cromaticos
+    let sourceChrominanceComponent = sourceImageData.toRGB().toChrominanceComponent();
+    
+    // Desenha os tres componentes
+    sourceChrominanceComponent.drawLuminanceComponent();
+    sourceChrominanceComponent.drawRedChrominanceComponent();
+    sourceChrominanceComponent.drawBlueChrominanceComponent();
+
     let compressedImageData = compress(sourceChrominanceComponent)
+    
     console.log("compressed luminance", {
-        //Y: sourceChrominanceComponent.luminance,
-        //Cr: sourceChrominanceComponent.redChrominance,
+        Y: sourceChrominanceComponent.luminance,
+        Cr: sourceChrominanceComponent.redChrominance,
         Cb: sourceChrominanceComponent.blueChrominance
     });
     console.log("compressed data", {encodedImage: compressedImageData.compressedData})
-
-
+    
     sourceChrominanceComponent.toRGB().toImageData().drawImage();
 
     //////////////////////////////
@@ -48,7 +67,7 @@ function main(imageObj) {
 
     let decompressedImageData = decompress(compressedImageData);
 
-    console.log(decompressedImageData);
+    //console.log(decompressedImageData);
 
     decompressedImageData.toRGB().toImageData().drawImage();
 }
