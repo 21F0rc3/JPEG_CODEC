@@ -3,6 +3,7 @@ import {dpcm_decode, dpcm_encode} from "../Encoders/DPCM.js";
 import {jpeg_processing} from "../Encoders/JPEG.js";
 import {huffmanTree} from "../Encoders/Huffman.js";
 import {drawImageFromImage, height, width} from "../Utils/ImageUtils.js";
+import {convertToBinary, convertToDecimal} from "../Utils/mathUtils.js";
 import {ChrominanceComponent} from "./ChrominanceComponent.js";
 
 export class JPEG_Stream {
@@ -186,54 +187,6 @@ function compressComponent(originalComponent) {
     return {compressedData: compressedData, huffmanMap: huffmanMap, residualArray: residualArray};
 }
 
-function convertToBinary(number) {
-    let binaryNumber;
-
-    if(number < 0) { // Se for negativo faz complemento
-        binaryNumber = dec2bin(Math.abs(number));
-        let bitsSteam = "";
-
-        for(let i=0; i<binaryNumber.length; i++) {
-            if(binaryNumber[i] == 1) {
-                bitsSteam += '0';
-            }else{
-                bitsSteam += '1';
-            }
-        }
-
-        binaryNumber = bitsSteam;
-    }else {
-        binaryNumber = dec2bin(number);
-    }
-
-    return binaryNumber;
-}
-
-function convertToDecimal(binaryNumber) {
-    let isNegativeNumber = false;
-
-    if(binaryNumber[0] == 0) { // Se o primeiro numero for 0, e um numero com complemento
-        let bitStream = "";
-        isNegativeNumber = true;
-
-        for(let i=0; i<binaryNumber.length; i++) {
-            if(binaryNumber[i] == 0) {
-                bitStream += '1';
-            }else{
-                bitStream += '0';
-            }
-        }
-
-        binaryNumber = bitStream;
-    }
-
-    let decimalNumber = parseInt(binaryNumber, 2);
-
-    //console.log(decimalNumber);
-
-    return isNegativeNumber == true ? -decimalNumber : decimalNumber;
-}
-
 /**
  *
  * @param compressedComponent {CompressedComponent}
@@ -283,7 +236,7 @@ function decompressComponent(compressedComponent) {
  *
  * @return {number}
  * */
-function getMapKey(map, iValue) {
+export function getMapKey(map, iValue) {
     let mapKeys = [...map.keys()];
     for (let i = 0; map.size; i++) {
         if (map.get(mapKeys[i]) == iValue) {
@@ -326,8 +279,4 @@ function decodeImage() {
     //console.log(signal_error_array);
 
     return signal_error_array;
-}
-
-function dec2bin(dec) {
-    return (dec >>> 0).toString(2);
 }

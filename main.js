@@ -5,6 +5,7 @@ import {jpeg_processing} from "./Encoders/JPEG.js";
 import {huffmanTree} from "./Encoders/Huffman.js";
 import {JPEG_Stream, JPEG_LS} from "./Objects/JPEG_Stream.js";
 import {ChrominanceComponent} from "./Objects/ChrominanceComponent.js";
+import { calculateAverageCodeLength, calculateCompressionRatio, getImageSize } from "./Utils/metricsUtils.js";
 
 /** Abre a imagem e começa o enconder */
 let imageObj = new Image();
@@ -31,6 +32,10 @@ function main() {
 
     const sourceImageData = ImageData.getImageDataFromImage(context)
 
+    // Tamanho da imagem original
+    let inputImageSize = getImageSize(sourceImageData.data);
+    console.log(inputImageSize);
+
     /*
     console.log("original luminance", {
         Y: sourceChrominanceComponent.luminance,
@@ -50,8 +55,14 @@ function main() {
     sourceChrominanceComponent.drawRedChrominanceComponent();
     sourceChrominanceComponent.drawBlueChrominanceComponent();
 
+    // Cronometra o tempo de compressão
+    let startCompressTime = new Date();
+
     let compressedImageData = compress(sourceChrominanceComponent)
     
+    // Cronometra o tempo de compressão
+    let endCompressTime = new Date();
+
     console.log("compressed luminance", {
         Y: sourceChrominanceComponent.luminance,
         Cr: sourceChrominanceComponent.redChrominance,
@@ -61,15 +72,46 @@ function main() {
     
     sourceChrominanceComponent.toRGB().toImageData().drawImage();
 
+    // Tamanho da imagem comprimida
+    let outputImageSize = compressedImageData.compressedData.luminance.compressedData.length+
+                          compressedImageData.compressedData.blueChrominance.compressedData.length+
+                          compressedImageData.compressedData.redChrominance.compressedData.length;
+    //console.log(outputImageSize);
+
     //////////////////////////////
     //      DESCOMPRESSÃO       //
     //////////////////////////////
 
+    // Cronometra o tempo de descompressão
+    let startDecompressTime = new Date();
+
     let decompressedImageData = decompress(compressedImageData);
+
+    // Cronometra o tempo de descompressão
+    let endDecompressTime = new Date();
 
     //console.log(decompressedImageData);
 
     decompressedImageData.toRGB().toImageData().drawImage();
+
+
+    //////////////////////////////
+    //         Metricas         //
+    //////////////////////////////
+
+    calculateCompressionRatio(inputImageSize, outputImageSize);
+    calculateAverageCodeLength(compressedImageData.compressedData.luminance, compressedImageData.compressedData.blueChrominance, compressedImageData.compressedData.redChrominance);
+    
+    var startTimeStamp = startCompressTime.getFullYear()+'-'+(startCompressTime.getMonth()+1)+'-'+startCompressTime.getDate()+'  '+ startCompressTime.getHours() + ":" + startCompressTime.getMinutes() + ":" + startCompressTime.getSeconds();
+    var endTimeStamp = endCompressTime.getFullYear()+'-'+(endCompressTime.getMonth()+1)+'-'+ endCompressTime.getDate()+'  '+ endCompressTime.getHours() + ":" + endCompressTime.getMinutes() + ":" + endCompressTime.getSeconds();
+    //console.log(startTimeStamp);
+    //console.log(endTimeStamp);
+
+    // Compression Time
+    console.log("Compression Time: "+(endCompressTime.getSeconds() - startCompressTime.getSeconds())+" sec");
+
+    // Decompression Time
+    console.log("Decompression Time: "+(endDecompressTime.getSeconds() - startDecompressTime.getSeconds())+" sec");
 }
 
 /**

@@ -92,5 +92,5 @@ export class huffmanTree{
             result += map[originStr[i]];  
         }  
         return result;  
-    }  
+    }
 }
