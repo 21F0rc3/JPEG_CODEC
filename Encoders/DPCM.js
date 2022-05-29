@@ -1,6 +1,10 @@
 import { width, height } from "../Utils/ImageUtils.js";
 
-const PREDICTOR_TABLE_MODE = 7;
+let PREDICTOR_TABLE_MODE = 0;
+
+export function setPredictorMode(mode) {
+    PREDICTOR_TABLE_MODE = mode;
+}
 
 /**
  * Differential pulse code modulation is a technique of analog to digital
@@ -33,7 +37,6 @@ export function dpcm_encode(data) {
         // Pixel codificado.
         residualArray[i] = residual;
     }
-
     //console.log(residualArray);
 
     return residualArray;

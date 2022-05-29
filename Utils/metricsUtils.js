@@ -15,8 +15,10 @@ export function getImageSize(image) {
 export function calculateCompressionRatio(inputImageSize, outputImageSize) {
     let compressionRatio = outputImageSize / inputImageSize;
     
-    console.log(compressionRatio);
-    console.log("Compression Ratio -> "+Math.floor(1/compressionRatio)+":1");
+    //console.log(compressionRatio);
+    //console.log("Compression Ratio -> "+Math.floor(1/compressionRatio)+":1");
+
+    return compressionRatio;
 }
 
 export function calculateAverageCodeLength(luminanceCompressedData, blueChrominanceCompressedData, redChrominanceCompressedData) {
@@ -28,7 +30,7 @@ export function calculateAverageCodeLength(luminanceCompressedData, blueChromina
 
     let ACL = totalBits / (x + y + z);
 
-    console.log("Average Code Length ->"+ACL+" bits per symbol");
+    //console.log("Average Code Length ->"+ACL+" bits per symbol");
 
     return ACL;
 }
@@ -65,6 +67,6 @@ function calculateNrOfSymbol(compressedComponent) {
         }
     }
 
-    console.log(SymbolNo);
+    //console.log(SymbolNo);
     return SymbolNo;
 }
