@@ -23,7 +23,7 @@ import {createCanvas} from "../Utils/ImageUtils.js";
 export class ImageData {
     constructor(data = []) {
         this.data = data;
-    } 
+    }
 
     /**
      * Pega numa imagem e obtem os dados dos pixeis e coloca num array
@@ -39,7 +39,27 @@ export class ImageData {
         let imageData = context.getImageData(0, 0, width, height);
         let data = imageData.data;
 
+        //this.createTestImageData(data);
+
         return new ImageData(data);
+    }
+
+    static createTestImageData(data) {
+        let testImage = [
+            255,255,0,255,255,
+            255,0,255,0,255,
+            0,255,255,255,0,
+            255,0,255,0,255,
+            255,255,0,255,255
+        ];
+        
+        // So para criar uma imagem teste
+        for(let i=0, j=0; i<testImage.length; i++, j+=4) {
+            data[j] = testImage[i];
+            data[j+1] = testImage[i];
+            data[j+2] = testImage[i];
+            data[j+3] = testImage[i];
+        }
     }
 
     /**
@@ -56,8 +76,11 @@ export class ImageData {
         let imgData = context.createImageData(width, height);
         let data = imgData.data;
 
-        for(var i=0, n = this.data.length * 4; i < n; i++) {
+        for(let i=0, n = this.data.length * 4; i < n; i+=4) {
             data[i] = this.data[i];
+            data[i+1] = this.data[i+1];
+            data[i+2] = this.data[i+2];
+            data[i+3] = 255; // Alpha
         }
     
         context.putImageData(imgData, imageX, imageY);
@@ -79,15 +102,14 @@ export class ImageData {
      */
     toRGB() {
         // Arrays 2D
-        let red = [], green = [], blue = [], alpha = [];
+        let red = [], green = [], blue = [];
 
         for(let i=0, j=0; i < (height * width); i++, j+=4) {
                 red[i] = this.data[j];
                 green[i] = this.data[j + 1];
                 blue[i] = this.data[j + 2];
-                alpha[i] = this.data[j + 3];
         }
 
-        return new RGB(height, width, red, green, blue, alpha);
+        return new RGB(height, width, red, green, blue);
     }
 }

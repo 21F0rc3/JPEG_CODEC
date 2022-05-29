@@ -8,19 +8,66 @@
   
 <body>
     <h1>JPEG - Lossless compression</h1>
-    <script src='https://cdn.jsdelivr.net/gh/AlexSp3/Basenumber.js@main/BaseNumber.min.js'></script>
-    
-    <script type="module" src="Utils/mathUtils.js"></script>
-    <script type="module" src="Utils/ImageUtils.js"></script>
-    <script type="module" src="Objects/ChrominanceComponent.js"></script>
-    <script type="module" src="Objects/ImageData.js"></script>
-    <script type="module" src="Objects/RGB.js"></script>
-    <script type="module" src="Objects/Binary.js"></script>
-    <script type="module" src="Objects/JPEG_Stream.js"></script>
-    <script type="module" src="Encoders/DPCM.js"></script>
-    <script type="module" src="Encoders/JPEG.js"></script>
-    <script type="module" src="Encoders/Huffman.js"></script>
-    <script type="module" src="main.js"></script>
-</body>
-  
+
+    <input type="file" id="fileElem" accept="image/*" style="display:none" onchange="handleFiles(this.files)">
+    <a href="#" id="fileSelect">Select some files</a>
+    <div id="fileList">
+      <p>No files selected!</p>
+    </div>
+
+    <label for="predictor_mode">Escolha um modo de predição: </label>
+    <select name="predictor_mode" id="predictor_mode">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+    </select>
+
+    <button id="start">Start</button>
+</body>  
+<script src='https://cdn.jsdelivr.net/gh/AlexSp3/Basenumber.js@main/BaseNumber.min.js'></script>
+<script type="module" src="main.js"></script>
+<script>
+    window.URL = window.URL || window.webkitURL;
+
+    var fileSelect = document.getElementById("fileSelect"),
+        fileElem = document.getElementById("fileElem"),
+        fileList = document.getElementById("fileList");
+
+    fileSelect.addEventListener("click", function (e) {
+    if (fileElem) {
+        fileElem.click();
+    }
+        e.preventDefault(); // prevent navigation to "#"
+    }, false);
+
+    function handleFiles(files) {
+        if (!files.length) {
+            fileList.innerHTML = "<p>No files selected!</p>";
+        } else {
+            var list = document.createElement("ul");
+            for (var i = 0; i < files.length; i++) {
+                var li = document.createElement("li");
+                list.appendChild(li);
+
+                var img = document.createElement("img");
+                img.src = window.URL.createObjectURL(files[i]);
+                img.onload = function(e) {
+                    window.URL.revokeObjectURL(this.src);
+                }
+                img.setAttribute('id', 'sourceImage');
+                li.appendChild(img);
+
+                var info = document.createElement("span");
+                info.innerHTML = files[i].name + ": " + files[i].size + " bytes";
+                li.appendChild(info);
+            }
+            fileList.appendChild(list);
+        }
+    }
+</script>
 </html>

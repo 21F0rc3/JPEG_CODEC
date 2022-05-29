@@ -16,7 +16,6 @@ const PREDICTOR_TABLE_MODE = 7;
  */
 export function dpcm_encode(data) {
     let residualArray = [];
-    let predictor = [];
 
     let sample_value = 0;
     let prediction_value = 0;
@@ -26,18 +25,16 @@ export function dpcm_encode(data) {
         sample_value = data[i];
 
         // Valor baseado nos pixeis vizinhos
-        prediction_value = predictPixel(predictor, i);
+        prediction_value = predictPixel(data, i);
 
         // Diferença entre o valor previsto e o valor real
         residual = sample_value - prediction_value;
 
-        // Pixel codificado. OBS: Arredondado para baixo!
-        residualArray[i] = residual;//Math.floor(residual);
-
-        predictor[i] = prediction_value + residual;
+        // Pixel codificado.
+        residualArray[i] = residual;
     }
 
-    console.log(residualArray);
+    //console.log(residualArray);
 
     return residualArray;
 }

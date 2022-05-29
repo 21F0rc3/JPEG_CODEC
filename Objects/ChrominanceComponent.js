@@ -1,4 +1,6 @@
 import {RGB} from "./RGB.js";
+import {createCanvas} from "../Utils/ImageUtils.js";
+import { width, height } from "../Utils/ImageUtils.js";
 
 /**
  * Classe reponsavel pelos Componentes Cromaticos
@@ -16,13 +18,13 @@ export class ChrominanceComponent {
      * 
      * @author Gabriel Fernandes 17/04/2022
      */
-    constructor(width, heigth, luminance = [], blueChrominance = [], redChrominance = [], alpha = []) {
+    constructor(width, heigth, luminance = [], blueChrominance = [], redChrominance = []/*, alpha = []*/) {
         this.width = width;
         this.height = heigth;
         this.luminance = luminance;
         this.blueChrominance = blueChrominance;
         this.redChrominance = redChrominance;
-        this.alpha = alpha;
+        //this.alpha = alpha;
     }
 
 
@@ -43,17 +45,17 @@ export class ChrominanceComponent {
         const red = [];
         const blue = [];
         const green = [];
-        const alpha = [];
+        //const alpha = [];
 
         for(let i = 0; i < (this.width * this.height); i++) {
             // Converte para os pixeis RGB
-            red[i] = 1 * this.luminance[i] + 0 * this.blueChrominance[i] + 1.13983 * this.redChrominance[i];
+            red[i] = 1 * this.luminance[i] + 1.13983 * this.redChrominance[i];
             green[i] = 1 * this.luminance[i] - 0.39465 * this.blueChrominance[i] - 0.58060 * this.redChrominance[i];
             blue[i] = 1 * this.luminance[i] + 2.03211 * this.blueChrominance[i];
-            alpha[i] = this.alpha[i];
+         //   alpha[i] = this.alpha[i];
         }
 
-        return new RGB(this.width, this.height, red, green, blue, alpha);
+        return new RGB(this.width, this.height, red, green, blue);
     }
 
     drawLuminanceComponent() {
@@ -64,20 +66,14 @@ export class ChrominanceComponent {
     
         let imgData = context.createImageData(width, height);
         let data = imgData.data;
-     
-        let i = 0;
+             
+        for(let i = 0, j=0; i < this.luminance.length; i++, j+=4) {
+            data[j] = this.luminance[i];    
+            data[j + 1] = this.luminance[i]; 
+            data[j + 2] = this.luminance[i];            
+            data[j + 3] = 255;
 
-        for(let r = 0; r < this.luminance.length; r++) {
-            for(let c = 0; c < this.luminance[r].length; c++) {
-                data[i] = this.luminance[r][c] / 0.299;    // RED
-                data[i + 1] = this.luminance[r][c] / 0.587; // GREEN
-                data[i + 2] = this.luminance[r][c] / 0.114; // BLUE
-                data[i + 3] = this.alpha[r][c];
-
-                //console.log("R: "+data[i]+"G: "+data[i+1]+"B: "+data[i+2]+"A: "+data[i+3]);
-
-                i += 4;
-            }
+            //console.log("R: "+data[i]+"G: "+data[i+1]+"B: "+data[i+2]+"A: "+data[i+3]);   
         } 
 
         context.putImageData(imgData, imageX, imageY);
@@ -91,14 +87,16 @@ export class ChrominanceComponent {
     
         let imgData = context.createImageData(width, height);
         let data = imgData.data;
-     
-        for(var i=0, j=0, n = this.blueChrominance.length; j < n; i+=4, j++) {
-            data[i] = this.blueChrominance[j] / -0.14713;        // RED
-            data[i + 1] = this.blueChrominance[j] / -0.28886;    // GREEN
-            data[i + 2] = this.blueChrominance[j] / 0.436;    // BLUE
-            data[i + 3] = this.alpha[j];
-        }
-    
+             
+        for(let i = 0, j=0; i < this.blueChrominance.length; i++, j+=4) {
+            data[j] = 0/*this.blueChrominance[i]*/;    
+            data[j + 1] = 0/*this.blueChrominance[i]*/; 
+            data[j + 2] = this.blueChrominance[i];            
+            data[j + 3] = 255;
+
+            //console.log("R: "+data[i]+"G: "+data[i+1]+"B: "+data[i+2]+"A: "+data[i+3]);   
+        } 
+
         context.putImageData(imgData, imageX, imageY);
     }
 
@@ -110,14 +108,16 @@ export class ChrominanceComponent {
     
         let imgData = context.createImageData(width, height);
         let data = imgData.data;
-     
-        for(var i=0, j=0, n = this.redChrominance.length; j < n; i+=4, j++) {
-            data[i] = this.redChrominance[j] / 0.615;        // RED
-            data[i + 1] = this.redChrominance[j] / -0.51499;    // GREEN
-            data[i + 2] = this.redChrominance[j] / -0.10001;    // BLUE
-            data[i + 3] = this.alpha[j];
-        }
-    
+             
+        for(let i = 0, j=0; i < this.redChrominance.length; i++, j+=4) {
+            data[j] = this.redChrominance[i];    
+            data[j + 1] = 0/*this.redChrominance[i]*/; 
+            data[j + 2] = 0/*this.redChrominance[i]*/;            
+            data[j + 3] = 255;
+
+            //console.log("R: "+data[i]+"G: "+data[i+1]+"B: "+data[i+2]+"A: "+data[i+3]);   
+        } 
+
         context.putImageData(imgData, imageX, imageY);
     }
 
