@@ -33,5 +33,5 @@ export function drawImageFromImage(imageObj) {
 
     context.drawImage(imageObj, imageX, imageY);
 
-    return context;
+    return context.getImageData(0, 0, width, height).data;
 }

@@ -1,134 +1,102 @@
-import {drawImageFromImage, height, width} from "./Utils/ImageUtils.js"
+import { setPredictorMode } from "./Encoders/DPCM.js";
 import {ImageData} from "./Objects/ImageData.js"
-import {dpcm_decode, dpcm_encode, setPredictorMode} from "./Encoders/DPCM.js";
-import {jpeg_processing} from "./Encoders/JPEG.js";
-import {huffmanTree} from "./Encoders/Huffman.js";
-import {JPEG_Stream, JPEG_LS} from "./Objects/JPEG_Stream.js";
+import { JPEG_LS} from "./Objects/JPEG_Stream.js";
 import {ChrominanceComponent} from "./Objects/ChrominanceComponent.js";
+import {drawImageFromImage} from "../Utils/ImageUtils.js";
 import { calculateAverageCodeLength, calculateCompressionRatio, getImageSize } from "./Utils/metricsUtils.js";
-
-
-/** Abre a imagem e começa o enconder */
-/*let imageObj = new Image();
-imageObj.onload = function () {
-    main(this);
-}
-//imageObj.src = "Horario.PNG";
-imageObj.src = "Horario.PNG";
-*/
 
 var startButton = document.getElementById("start");
 
+let sourceChrominanceComponents, decompressedImageData, compressedImageData, sourceImageData;
+
 startButton.onclick = function() {
-    //console.log(parseInt(document.getElementById("predictor_mode").value));
-    clear();
+    //clear();
     setPredictorMode(parseInt(document.getElementById("predictor_mode").value));
     main();
 }
 
-function clear() {/*
-    const elements = document.getElementsByTagName("canvas");
-    
-    if(elements != null) {
-        elements.remove();
-    }*/
-}
-
-function main() {
+function convertUploadedImageToImageData() {
     // Vai buscar os dados da imagem que foi enviada
-    let imageObj = new Image();
-    imageObj = document.getElementById('sourceImage');
+    let imageObj = document.getElementById('sourceImage');
 
     // Imagem original
-    let context = drawImageFromImage(imageObj);
+    let imageData = drawImageFromImage(imageObj);
 
-    const sourceImageData = ImageData.getImageDataFromImage(context)
+    return new ImageData(imageData);
+}
 
-    // Tamanho da imagem original
-    let inputImageSize = getImageSize(sourceImageData.data);
-    //console.log(inputImageSize);
 
-    /*
-    console.log("original luminance", {
-        Y: sourceChrominanceComponent.luminance,
-        Cr: sourceChrominanceComponent.redChrominance,
-        Cb: sourceChrominanceComponent.blueChrominance
-    });*/
+function main() {
+    sourceImageData = convertUploadedImageToImageData();
 
     /////////////////////////////
     //      COMPRESSÃO         //
     /////////////////////////////
 
-    // Converte para Components cromaticos
-    let sourceChrominanceComponent = sourceImageData.toRGB().toChrominanceComponent();
-    
-    // Desenha os tres componentes
-    sourceChrominanceComponent.drawLuminanceComponent();
-    sourceChrominanceComponent.drawRedChrominanceComponent();
-    sourceChrominanceComponent.drawBlueChrominanceComponent();
+    let compressTime = new Date();
 
-    // Cronometra o tempo de compressão
-    let startCompressTime = new Date();
+    compressedImageData = compress(sourceImageData);
 
-    let compressedImageData = compress(sourceChrominanceComponent)
-    
-    // Cronometra o tempo de compressão
-    let endCompressTime = new Date();
-
-    /*
-    console.log("compressed luminance", {
-        Y: sourceChrominanceComponent.luminance,
-        Cr: sourceChrominanceComponent.redChrominance,
-        Cb: sourceChrominanceComponent.blueChrominance
-    });
-    console.log("compressed data", {encodedImage: compressedImageData.compressedData})
-    */
-
-    sourceChrominanceComponent.toRGB().toImageData().drawImage();
-
-    // Tamanho da imagem comprimida
-    let outputImageSize = compressedImageData.compressedData.luminance.compressedData.length+
-                          compressedImageData.compressedData.blueChrominance.compressedData.length+
-                          compressedImageData.compressedData.redChrominance.compressedData.length;
-    //console.log(outputImageSize);
+    compressTime = compressTime.getSeconds() - new Date().getSeconds();
 
     //////////////////////////////
     //      DESCOMPRESSÃO       //
     //////////////////////////////
 
-    // Cronometra o tempo de descompressão
-    let startDecompressTime = new Date();
+    let decompressTime = new Date();
 
-    let decompressedImageData = decompress(compressedImageData);
+    decompressedImageData = decompress(compressedImageData);
 
-    // Cronometra o tempo de descompressão
-    let endDecompressTime = new Date();
+    decompressTime = decompressTime.getSeconds() - new Date().getSeconds();
 
-    //console.log(decompressedImageData);
-
-    decompressedImageData.toRGB().toImageData().drawImage();
-
+    //////////////////////////////
+    //         Desenha          //
+    //////////////////////////////
+    drawCompressionSteps();
 
     //////////////////////////////
     //         Metricas         //
     //////////////////////////////
+    calculateMetrics(compressTime, decompressTime);
+}
+
+function drawCompressionSteps() {
+    // Desenha os tres componentes
+    sourceChrominanceComponents.drawLuminanceComponent();
+    sourceChrominanceComponents.drawRedChrominanceComponent();
+    sourceChrominanceComponents.drawBlueChrominanceComponent();
+
+    sourceChrominanceComponents.toRGB().toImageData().drawImage();
+
+    decompressedImageData.toRGB().toImageData().drawImage();
+}
+
+/**
+ *
+ * @param source_image {ChrominanceComponent}
+ * @return {JPEG_LS}
+ */
+function compress(sourceImageData) {
+    // Converte para Components cromaticos
+    sourceChrominanceComponents = sourceImageData.toRGB().toChrominanceComponent();
+    return JPEG_LS.compress(sourceChrominanceComponents);
+}
+
+function decompress(compressedImageData) {
+    return JPEG_LS.decompress(compressedImageData);
+}
+
+function calculateMetrics(compressTime, decompressTime) {
+    // Tamanho da imagem original
+    let inputImageSize = getImageSize(sourceImageData.data);
+
+    // Tamanho da imagem comprimida
+    let outputImageSize = compressedImageData.compressedData.luminance.compressedData.length+
+                          compressedImageData.compressedData.blueChrominance.compressedData.length+
+                          compressedImageData.compressedData.redChrominance.compressedData.length;
 
     let CR = calculateCompressionRatio(inputImageSize, outputImageSize);
     let ACL = calculateAverageCodeLength(compressedImageData.compressedData.luminance, compressedImageData.compressedData.blueChrominance, compressedImageData.compressedData.redChrominance);
-
-    //var startTimeStamp = startCompressTime.getFullYear()+'-'+(startCompressTime.getMonth()+1)+'-'+startCompressTime.getDate()+'  '+ startCompressTime.getHours() + ":" + startCompressTime.getMinutes() + ":" + startCompressTime.getSeconds();
-    //var endTimeStamp = endCompressTime.getFullYear()+'-'+(endCompressTime.getMonth()+1)+'-'+ endCompressTime.getDate()+'  '+ endCompressTime.getHours() + ":" + endCompressTime.getMinutes() + ":" + endCompressTime.getSeconds();
-    //console.log(startTimeStamp);
-    //console.log(endTimeStamp);
-
-    let CT = endCompressTime.getSeconds() - startCompressTime.getSeconds();
-    let DT = endDecompressTime.getSeconds() - startDecompressTime.getSeconds();
-
-    // Compression Time
-    console.log("Compression Time: "+CT+" sec");
-
-    // Decompression Time
-    console.log("Decompression Time: "+DT+" sec");
 
     let div = document.createElement("div");
 
@@ -139,10 +107,10 @@ function main() {
     p2.innerHTML = "Average Code Length: "+ACL;
 
     let p3 = document.createElement("p");
-    p3.innerHTML = "Coding Time: "+CT;
+    p3.innerHTML = "Coding Time: "+compressTime;
     
     let p4 = document.createElement("p");
-    p4.innerHTML = "Decoding Time: "+DT;
+    p4.innerHTML = "Decoding Time: "+decompressTime;
 
     div.appendChild(p1);
     div.appendChild(p2);
@@ -150,17 +118,4 @@ function main() {
     div.appendChild(p4);
 
     document.body.appendChild(div);
-}
-
-/**
- *
- * @param source_image {ChrominanceComponent}
- * @return {JPEG_LS}
- */
-function compress(source_image) {
-    return JPEG_LS.compress(source_image);
-}
-
-function decompress(compressedImage) {
-    return JPEG_LS.decompress(compressedImage);
 }

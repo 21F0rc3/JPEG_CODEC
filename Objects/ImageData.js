@@ -21,27 +21,9 @@ import {createCanvas} from "../Utils/ImageUtils.js";
  * @author Gabriel Fernandes 18/04/2022
  */
 export class ImageData {
-    constructor(data = []) {
-        this.data = data;
-    }
-
-    /**
-     * Pega numa imagem e obtem os dados dos pixeis e coloca num array
-     * 
-     * @param {*} context - Contexto do canvas onde esta a imagem
-     * 
-     * @returns um Objeto ImageData que possui o array de pixeis com a 
-     * informação da imagem
-     * 
-     * @author Gabriel Fernandes 18/04/2022 
-     */
-    static getImageDataFromImage(context) {
-        let imageData = context.getImageData(0, 0, width, height);
-        let data = imageData.data;
-
-        //this.createTestImageData(data);
-
-        return new ImageData(data);
+    constructor(imageData) {
+        //let imageData = context.getImageData(0, 0, width, height);
+        this.data = imageData;
     }
 
     static createTestImageData(data) {
