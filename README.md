@@ -53,7 +53,7 @@
 
 
 ### Authors:
-- Gabriel Fernandes (garbielforce21@gmail.com)
+- Gabriel Fernandes (gabrielforce21@gmail.com)
 - Frederico Pinto (39822@ufp.edu.pt)
   
 ## About The Project
